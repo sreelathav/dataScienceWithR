@@ -1,0 +1,26 @@
+data(iris)
+library(nnet)
+fit<-multinom(Species~.,data=iris)
+p<-predict(fit,type="prob")
+Psetosa<-cbind(p[,1],p[,2]+p[,3])
+Pversicolor<-cbind(p[,2],p[,1]+p[,3])
+Pvirginica<-cbind(p[,3],p[,1]+p[,2])
+#################
+data(iris)
+library(adabag)
+N<-nrow(iris)
+indtrain<-sort(sample(1:N,size=N*0.75))
+indtest<-setdiff(1:N,indtrain)
+Ntrain<-length(indtrain)
+Ntest<-length(indtest)
+iristrain<-iris[indtrain,]
+iristest<-iris[indtest,]
+fit<-boosting(Species~.,data=iristrain)
+pred<-predict(fit,newdata=iristest)
+pred
+# Shuffle column j of the test data (try j=1,2,3,4)
+iristestnoise<-iristest
+j<-4
+iristestnoise[,j]<-iristestnoise[sample(1:Ntest),j]
+prednoise<-predict(fit,newdata=iristestnoise)
+prednoise
